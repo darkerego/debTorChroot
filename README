@@ -1,0 +1,2 @@
+You must set your architecture in the make-tor-chroot.sh script, at the line that says "arch=". Write either 'arch32' or 
+'arch64'. This script was tested on Ubuntu Server Edition 14.04, i686. It's a little buggy. Contribtions welcome.
