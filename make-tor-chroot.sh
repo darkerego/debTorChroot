@@ -1,15 +1,10 @@
 #!/bin/bash
 
-# Will replace with a nice case statement soon
-if [[ $1 == "--gen-tar" ]]; then
-	doArchive=1
-elif [[ $1 == "--gen-tor" ]];then
-	makeTor=1
-elif [[ $1 == "--gen-all" ]];then
-	doBoth=1
-elif [[ $1 == "" ]];then
-	echo "Usage: $0 <option> [[ --gen-tor | gen-tar | gen-all ]]"
-fi
+USAGE=$(
+echo "Usage: $0 <option> [[--build|-b | --configure|-c | --archive|-a]] ";echo "";
+echo "[[--build | -b : Compile tor in chroot ]]";echo "";
+echo "[ --configure | -c : Configure torrc in chroot ]]";echo "";
+echo "[ --archive | -a : Generate a tar achive and hashsums from generated tor]]")
 
 
 function getDeps(){
@@ -100,19 +95,27 @@ md5sum $dest/tor-chroot.tar.gz > $dest/tor-chroot.tar.gz.md5
 
 
 
-if [[ $doArchive == "1" ]];then
-	genTz
-fi
-if [[ $makeTor == "1" ]];then
+case "$1" in
+
+--build|-b)  echo "Getting source and dependencies..."
 	getDeps
+	echo "Starting compilation process..."
 	makeTor
+	echo "Creating torrc..."
 	confTorrc
-fi
-if [[ $doBoth == "1" ]];then
-	getDeps
-	makeTor
-	confTorrc
-	genTz
-fi
+    ;;
+--configure|-c)  echo  "Generating and adding torrc file..."
+    	confTorrc
+    ;;
+--archive|-a) echo  "Generating a tar.gz archive and hashsums..."
+   	genTz
+   ;;
+*) echo "Invalid or no option..."
+	echo $USAGE
+   ;;
+esac
+
+
+
 
 exit
