@@ -1,4 +1,4 @@
-# make-tor-chroot
+#make-tor-chroot
 
 Scripted from <a href="https://trac.torproject.org/projects/tor/wiki/doc/TorInChroot">torproject.org's chroot instructions</a>, 
 this is a shell script for Ubuntu systems (although it may also work on Debian systems) that builds and configures a 
@@ -9,7 +9,7 @@ file is automated as well, so after running this script you can just go ahead an
 echo "TORCHROOT=/home/tor/chroot" >> ~/.bashrc
 sudo chroot $TORCHROOT /tor/bin/tor
 
-# Usage
+#Usage
 
 ./make-tor-chroot.sh  <[[ --gen-tor | gen-tar | gen-all ]]>
   * --gen-tor : Just generate the chroot & build tor
