@@ -6,8 +6,8 @@ chrooted tor daemon. It's no longer necessary to specify the architecture, as th
 chroot will end up in /home/tor/chroot, and a user ("tor") will be added to the system. The configuration of the torrc 
 file is automated as well, so after running this script you can just go ahead and start tor:
 
-$ echo "TORCHROOT=/home/tor/chroot" >> ~/.bashrc
-$ sudo chroot $TORCHROOT /tor/bin/tor
+* echo "TORCHROOT=/home/tor/chroot" >> ~/.bashrc
+* sudo chroot $TORCHROOT /tor/bin/tor
 
 #Usage
 
