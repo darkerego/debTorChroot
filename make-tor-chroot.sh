@@ -1,13 +1,28 @@
 #!/bin/bash
+# DebTorChrootGen
+# Author DarkerEgo
+# A shell script for ubuntu-esc systems that compiles tor in a chroot.
+# Also can create a tar.gz archive to be extracted on other systems for 
+# a portable, chrooted tor daemon.
 
-USAGE=$(
-echo "Usage: $0 <option> [[--build|-b | --configure|-c | --archive|-a]] ";echo "";
-echo "[[--build | -b : Compile tor in chroot ]]";echo "";
-echo "[ --configure | -c : Configure torrc in chroot ]]";echo "";
-echo "[ --archive | -a : Generate a tar achive and hashsums from generated tor]]")
+usage(){
+echo "▄▄▄▄▄      ▄▄▄   ▄▄·  ▄ .▄▄▄▄             ▄▄▄▄▄ ▄▄ • ▄▄▄ . ▐ ▄ ";
+echo "•██  ▪     ▀▄ █·▐█ ▌▪██▪▐█▀▄ █·▪     ▪    •██  ▐█ ▀ ▪▀▄.▀·•█▌▐█";
+echo " ▐█.▪ ▄█▀▄ ▐▀▀▄ ██ ▄▄██▀▐█▐▀▀▄  ▄█▀▄  ▄█▀▄ ▐█.▪▄█ ▀█▄▐▀▀▪▄▐█▐▐▌";
+echo " ▐█▌·▐█▌.▐▌▐█•█▌▐███▌██▌▐▀▐█•█▌▐█▌.▐▌▐█▌.▐▌▐█▌·▐█▄▪▐█▐█▄▄▌██▐█▌";
+echo " ▀▀▀  ▀█▄▀▪.▀  ▀·▀▀▀ ▀▀▀ ·.▀  ▀ ▀█▄▀▪ ▀█▄▀▪▀▀▀ ·▀▀▀▀  ▀▀▀ ▀▀ █▪";
 
+echo "Usage: $0 [[--build|-b | --configure|-c | --archive|-a"
+echo "[[ ---------------------------------------------------------- ]]"
+echo "[[    --generate |-g : Build tor chroot, configure, archive   ]]"
+echo "[[    --build    |-b : Compile tor in chroot, add tor user    ]]"
+echo "[[    --configure|-c : Configure chroot torrc file defaults   ]]"
+echo "[[    --archive  |-a : Generate tar gz achive and hashsums    ]]"
+echo "[[ ---------------------------------------------------------- ]]"
 
-function getDeps(){
+}
+
+getDeps(){
 sudo apt-get install libc6 libevent-2.0-5 libssl1.0.0 zlib1g lsb-base libssl-dev libevent-dev libnss3-1d-dbg
 wget https://www.torproject.org/dist/tor-0.2.6.10.tar.gz
 wget https://www.torproject.org/dist/tor-0.2.6.10.tar.gz.asc
@@ -15,7 +30,7 @@ gpg --recv-key 8D29319A
 gpg --verify tor-0.2.6.10.tar.gz.asc tor-0.2.6.10.tar.gz
 }
  
-function makeTor(){
+makeTor(){
 
 
 # determine arch
@@ -71,7 +86,7 @@ sudo chown tor:tor $TORCHROOT/var/srv
 }
 
 
-function confTorrc(){
+confTorrc(){
 cat <<EOF > /tmp/torrc
 User tor
 DataDirectory /var/lib/tor2
@@ -82,7 +97,7 @@ EOF
 sudo cp /tmp/torrc $TORCHROOT/tor/etc/tor/torrc
 }
 
-function genTz(){
+genTz(){
 TORCHROOT=/home/tor/chroot
 cwd=$(pwd)
 dest=$cwd/tor-chroot
@@ -91,28 +106,37 @@ sudo tar -zcvf $dest/tor-chroot.tar.gz /home/tor/chroot
 sha512sum $dest/tor-chroot.tar.gz > $dest/tor-chroot.tar.gz.sha512
 sha1sum $dest/tor-chroot.tar.gz > $dest/tor-chroot.tar.gz.sha1
 md5sum $dest/tor-chroot.tar.gz > $dest/tor-chroot.tar.gz.md5
+echo "For a portable(ish, root probably required) tor daemon," 
+echo "extract tar archive on another system and run."
 }
 
 
 
 case "$1" in
-
---build|-b)  echo "Getting source and dependencies..."
-	getDeps
-	echo "Starting compilation process..."
-	makeTor
-	echo "Creating torrc..."
-	confTorrc
-    ;;
---configure|-c)  echo  "Generating and adding torrc file..."
-    	confTorrc
-    ;;
---archive|-a) echo  "Generating a tar.gz archive and hashsums..."
-   	genTz
-   ;;
-*) echo "Invalid or no option..."
-	echo $USAGE
-   ;;
+ --generate|-g) echo "Building tor chroot, configuring torrc, and making tar with hashsums."
+    getDeps
+    echo "Starting compilation process..."
+    makeTor
+    echo  "Generating and adding torrc file..."
+    confTorrc
+    echo  "Generating a tar.gz archive and hashsums..."
+    genTz
+    echo "Done!"
+;;
+ --build|-b)  echo "Getting source and dependencies..."
+    getDeps
+    echo "Starting compilation process..."
+    makeTor
+;;
+ --configure|-c)  echo  "Generating and adding torrc file..."
+    confTorrc
+;;
+ --archive|-a) echo  "Generating a tar.gz archive and hashsums..."
+    genTz
+;;
+      *) echo "Invalid or no option..."
+    usage
+;;
 esac
 
 
